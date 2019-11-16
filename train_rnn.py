@@ -139,7 +139,7 @@ with torch.no_grad():
     print("test_loss : %f" %score)
     pred = pred.view(opt.nt - opt.nt_train, opt.nx)
     pred = pred.cpu().numpy()
-    np.savetxt("pred.txt", pred)
+    np.savetxt(os.path.join(opt.outputdir, opt.xp, 'pred.txt'), pred)
     logger.log('test_epoch.rmse', score)
     logger.log('test_epoch.ts', {t: {'rmse': scr.item()} for t, scr in enumerate(score_ts)}) # t : time, 0-55 scr : score
     # schedule lr
