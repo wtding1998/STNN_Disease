@@ -40,5 +40,3 @@ class rnn(nn.Module):
             pred_list.append(self.forward(init))
             init = self.update(init)
         return torch.stack(pred_list, dim=0).view(length, self.input_size, 1)
-
-            
