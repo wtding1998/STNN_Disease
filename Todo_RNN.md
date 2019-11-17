@@ -6,5 +6,6 @@
 - [x] add script
 - [ ] record and compare the time
 - [ ] the folder'path name
+- [ ] add a file to get the best consequence
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
