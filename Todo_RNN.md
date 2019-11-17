@@ -1,5 +1,11 @@
 # Todo
-- [ ] add GRU model
-    - [ ] add GRU model in rnn_model.py
-    - [ ] add option in train_rnn.py
-    - [ ] modify model in train_rnn.py
+- [x] add GRU model
+    - [x] add GRU model in rnn_model.py
+    - [x] add option in train_rnn.py
+    - [x] modify model in train_rnn.py
+- [ ] add script
+    - [ ] LSTM
+    - [ ] GRU
+- [ ] the folder'path name
+- [ ] draw the picture of test_loss
+- [ ] complete the code for n-dim data

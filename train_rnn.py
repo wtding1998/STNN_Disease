@@ -15,7 +15,7 @@ import torch.backends.cudnn as cudnn
 
 from get_data import dataset_factory
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string
-from rnn_model import rnn
+from rnn_model import LSTMNet, GRUNet
 import numpy as np
 
 
@@ -34,6 +34,7 @@ p.add('--xp', type=str, help='xp name', default='stnn')
 p.add('--seq_length', type=int, help='sequence length', default=5)
 p.add('--nhid', type=int, help='dynamic function hidden size', default=50)
 p.add('--nlayers', type=int, help='dynamic function num layers', default=3)
+p.add('--rnn_model', type=str, help='choose rnn model : LSTM | GRU', default='LSTM')
 # -- optim
 p.add('--lr', type=float, help='learning rate', default=3e-3)
 p.add('--beta1', type=float, default=.9, help='adam beta1')
@@ -87,7 +88,11 @@ for k, v in setup.items():
 #######################################################################################################################
 # Model
 #######################################################################################################################
-model = rnn(opt.nx, opt.nhid, opt.nlayers, opt.nx, opt.seq_length).to(device)
+if opt.rnn_model == 'LSTM':
+    model = LSTMNet(opt.nx, opt.nhid, opt.nlayers, opt.nx, opt.seq_length).to(device)
+if opt.rnn_model == 'GRU':
+    model = GRUNet(opt.nx, opt.nhid, opt.nlayers, opt.nx, opt.seq_length).to(device)
+
 
 #######################################################################################################################
 # Optimizer
