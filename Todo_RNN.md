@@ -4,7 +4,6 @@
     - [x] add option in train_rnn.py
     - [x] modify model in train_rnn.py
 - [x] add script
-- [ ] record and compare the time
 - [ ] the name of  outputdir
 - [ ] auto name mode
 - [x] make another dir for output

@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 from collections import defaultdict
 
 import torch
@@ -66,4 +67,7 @@ class Logger(object):
         torch.save(model.state_dict(), self.model_path)
 
 def get_dir(outputdir):
-    return os.path.abspath(os.path.join(os.getcwd(), "..", outputdir))
+    return os.path.abspath(os.path.join(os.getcwd(), "..", "output", outputdir))
+
+def get_time():
+    return datetime.datetime.now().strftime('%H-%M-%S-%Y-%m-%d')

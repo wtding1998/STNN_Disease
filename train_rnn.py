@@ -14,7 +14,7 @@ import torch.backends.cudnn as cudnn
 
 
 from get_data import dataset_factory
-from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir
+from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time
 from rnn_model import LSTMNet, GRUNet
 import numpy as np
 
@@ -30,6 +30,7 @@ p.add('--nt_train', type=int, help='time for training', default=100)
 # -- xp
 p.add('--outputdir', type=str, help='path to save xp', default='output')
 p.add('--xp', type=str, help='xp name', default='stnn')
+p.add('--auto', type=boolean_string, help='whether name outputdir and xp automatically', default=False)
 # -- model
 p.add('--seq_length', type=int, help='sequence length', default=5)
 p.add('--nhid', type=int, help='dynamic function hidden size', default=50)
@@ -44,7 +45,7 @@ p.add('--wd', type=float, help='weight decay', default=1e-6)
 # -- learning
 p.add('--batch_size', type=int, default=10, help='batch size')
 p.add('--patience', type=int, default=150, help='number of epoch to wait before trigerring lr decay')
-p.add('--nepoch', type=int, default=20000, help='number of epochs to train for')
+p.add('--nepoch', type=int, default=200, help='number of epochs to train for')
 p.add('--test', type=boolean_string, default=False, help='test during training')
 # -- gpu
 p.add('--device', type=int, default=-1, help='-1: cpu; > -1: cuda device id')
@@ -80,10 +81,12 @@ train_output = train_output.to(device)
 test_input = test_input.to(device)
 test_data = test_data.to(device)
 
-
-
 for k, v in setup.items():
     opt[k] = v
+
+if opt.auto:
+    opt.outputdir = opt.dataset + "_" + opt.rnn_model 
+    opt.xp = get_time() + "_" + str(opt.nlayers) + "_" + str(opt.nhid)
 
 #######################################################################################################################
 # Model
