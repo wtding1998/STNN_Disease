@@ -8,6 +8,6 @@
 #SBATCH --mail-user=569018166@sjtu.edu.cn
 #SBATCH --output=%j.out
 #SBATCH --err=%j.err
-#SBATCH --time=00:10:00
+#SBATCH --time=00:30:00
 
-python train_rnn.py --nepoch 1000 --rnn_model LSTM --outputdir output_aids --xp test --device -1
+python train_rnn.py --nepoch 120000 --rnn_model LSTM --outputdir output_aids --xp test --device -1

@@ -5,7 +5,10 @@
     - [x] modify model in train_rnn.py
 - [x] add script
 - [ ] record and compare the time
-- [ ] the folder'path name
+- [ ] the name of  outputdir
+- [ ] auto name mode
+- [x] make another dir for output
+    - [x] os find the dir
 - [ ] add a file to get the best consequence
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
