@@ -64,7 +64,7 @@ class Logger(object):
     def save(self, model):
         with open(self.log_path, 'w') as f:
             json.dump(self.logs, f, sort_keys=True, indent=4)
-        torch.save(model.state_dict(), self.model_path)
+        torch.save(model.state_dict(), self.model_path)      
 
 def get_dir(outputdir):
     return os.path.abspath(os.path.join(os.getcwd(), "..", "output", outputdir))

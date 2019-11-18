@@ -48,7 +48,7 @@ p.add('--wd', type=float, help='weight decay', default=1e-6)
 # -- learning
 p.add('--batch_size', type=int, default=10, help='batch size')
 p.add('--patience', type=int, default=150, help='number of epoch to wait before trigerring lr decay')
-p.add('--nepoch', type=int, default=200, help='number of epochs to train for')
+p.add('--nepoch', type=int, default=100, help='number of epochs to train for')
 p.add('--test', type=boolean_string, default=False, help='test during training')
 # -- gpu
 p.add('--device', type=int, default=-1, help='-1: cpu; > -1: cuda device id')
