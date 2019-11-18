@@ -30,7 +30,10 @@ p.add('--nt_train', type=int, help='time for training', default=100)
 # -- xp
 p.add('--outputdir', type=str, help='path to save xp', default='output')
 p.add('--xp', type=str, help='xp name', default='stnn')
-p.add('--auto', type=boolean_string, help='whether name outputdir and xp automatically', default=False)
+p.add('--dir_auto', type=boolean_string, help='dataset_model', default=True)
+p.add('--xp_auto', type=boolean_string, help='time', default=False)
+p.add('--xp_time', type=boolean_string, help='xp_time', default=True)
+p.add('--auto', type=boolean_string, help='dataset_model + time', default=False)
 # -- model
 p.add('--seq_length', type=int, help='sequence length', default=5)
 p.add('--nhid', type=int, help='dynamic function hidden size', default=50)
@@ -84,9 +87,15 @@ test_data = test_data.to(device)
 for k, v in setup.items():
     opt[k] = v
 
-if opt.auto:
+if opt.dir_auto:
     opt.outputdir = opt.dataset + "_" + opt.rnn_model 
-    opt.xp = get_time() + "_" + str(opt.nlayers) + "_" + str(opt.nhid)
+if opt.xp_time:
+    opt.xp = opt.xp + "_" + get_time()
+if opt.xp_auto:
+    opt.xp = get_time()
+if opt.auto_all:
+    opt.outputdir = opt.dataset + "_" + opt.rnn_model 
+    opt.xp = get_time()
 
 #######################################################################################################################
 # Model

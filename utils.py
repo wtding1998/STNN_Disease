@@ -70,4 +70,4 @@ def get_dir(outputdir):
     return os.path.abspath(os.path.join(os.getcwd(), "..", "output", outputdir))
 
 def get_time():
-    return datetime.datetime.now().strftime('%H-%M-%S-%Y-%m-%d')
+    return datetime.datetime.now().strftime('%H-%M-%S-%m-%d')
