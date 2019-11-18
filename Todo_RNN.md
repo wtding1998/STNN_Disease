@@ -10,7 +10,7 @@
 - [x] make another dir for output
     - [x] os find the dir
 - [x] update the git in server
-
+- [ ] weight decay
 something should left now : 
 - [ ] add test loss in config.json
 - [ ] add a file to get the best consequence
