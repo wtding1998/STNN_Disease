@@ -9,7 +9,7 @@
 - [x] auto name mode
 - [x] make another dir for output
     - [x] os find the dir
-- [ ] update the git in server
+- [x] update the git in server
 
 something should left now : 
 - [ ] add test loss in config.json
