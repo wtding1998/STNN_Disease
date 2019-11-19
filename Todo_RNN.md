@@ -11,6 +11,8 @@
     - [x] os find the dir
 - [x] update the git in server
 - [ ] weight decay
+- [ ] added normalize
+
 something should left now : 
 - [ ] add test loss in config.json
 - [ ] add a file to get the best consequence
