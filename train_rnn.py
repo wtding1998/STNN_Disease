@@ -165,4 +165,7 @@ with torch.no_grad():
     # lr = optimizer.param_groups[0]['lr']
     # if lr <= 1e-5:
     #     break
+opt.test_loss = score
+with open(os.path.join(get_dir(opt.outputdir), opt.xp, 'config.json'), 'w') as f:
+    json.dump(opt, f, sort_keys=True, indent=4)
 logger.save(model)

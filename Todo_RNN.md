@@ -10,8 +10,14 @@
 - [x] make another dir for output
     - [x] os find the dir
 - [x] update the git in server
+- [ ] complete batch_size
 - [ ] weight decay
-- [ ] added normalize
+- [ ] add normalize
+
+**result** : 
+- [ ] print the information for the given model | *test_time* 
+- [ ] summary the information of the total folder and get the best result | *nhid*
+- [ ] summary the information of the total mode | *aids_LSTM*
 
 something should left now : 
 - [ ] add test loss in config.json

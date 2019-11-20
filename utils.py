@@ -71,3 +71,37 @@ def get_dir(outputdir):
 
 def get_time():
     return datetime.datetime.now().strftime('%H-%M-%S-%m-%d')
+
+def file_name(file_dir):
+    for root, dirs, _ in os.walk(file_dir):
+        print("root :　")
+        print(root)  # 当前目录路径
+        print("-----------------------")
+
+
+def next_dir(path):
+    list = []
+    if (os.path.exists(path)):
+        files = os.listdir(path)
+        for file in files:
+            m = os.path.join(path,file)
+            if (os.path.isdir(m)):
+                h = os.path.split(m)
+                list.append(h[1])
+    return list
+
+def model_dir(outputdir):
+    mode_dir = next_dir(outputdir)
+    model_dir = {}
+    path_dir = {}
+    for mode in mode_dir:
+        di = os.path.join(outputdir, mode)
+        model_list = next_dir(di)  
+        model_dir[mode] = model_list
+    return model_dir
+
+
+# get the dataset and model for given folder "dataset_model"
+def get_model(folder_name):
+    li = folder_name.split('_')
+    return li[0], li[1]
