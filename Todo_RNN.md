@@ -18,8 +18,11 @@
 - [x] print the information for the given model | *test_time* 
 - [x] summary the information of the total folder and get the best result | *nhid*
 - [x] summary the information of the total mode | *aids_LSTM*
-- [ ] change the time for logs
+- [x] change the time for logs
+- [ ] add the mean to the beginning of the df
 - [ ] **write the information to be a class**
+    - init with folder
+    - info
 
 something should left now : 
 - [x] add test loss in config.json

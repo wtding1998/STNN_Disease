@@ -32,13 +32,12 @@ def get_list(string, folder):
             li.append(i)
     return li
 
-# TODO: ADD REQUIRED LIST
-# CHANGE TIME ORDER
-def get_df(folder, col=['nhid', 'nlayers'], required_list = 'all'):
-    if isinstance(folder, str):
-        requ = next_dir()
+# TODO: ADD A CLASS
+def get_df(folder, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
+    if isinstance(required_list, str):
+        required_list = next_dir(folder)
     df_list = []
-    for model_name in model_list: 
+    for model_name in required_list: 
         config = get_config(os.path.join(folder, model_name))
         new_df = pandas.DataFrame([config])[col]
         new_df.index = [model_name]
@@ -46,7 +45,6 @@ def get_df(folder, col=['nhid', 'nlayers'], required_list = 'all'):
     df =  pandas.concat(df_list, join='outer')
     df.name = folder.split('/')[-1]
     return df
-    # df = pandas.DataFrame()
 
 
 
@@ -57,10 +55,11 @@ def get_df(folder, col=['nhid', 'nlayers'], required_list = 'all'):
 # df.mean()
 
 # by list : 
-folder = 'D:/Jupyter_Documents/ML-code/research_code/output/aids_LSTM'
+# folder = os.path.abspath(os.path.join(os.getcwd(), "..", "output", 'aids_LSTM'))
 # get_list('nhid_10', folder)
-get_df(get_list('nhid_10', folder))        
-
+# print(get_list('00_08', folder))
+# print(get_df(folder, required_list=get_list('test_00_08', folder)))   
+# print(get_df(folder, required_list=[]))
 
 # predictions = {}
 # for exp in exps:
