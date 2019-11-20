@@ -70,14 +70,7 @@ def get_dir(outputdir):
     return os.path.abspath(os.path.join(os.getcwd(), "..", "output", outputdir))
 
 def get_time():
-    return datetime.datetime.now().strftime('%H-%M-%S-%m-%d')
-
-def file_name(file_dir):
-    for root, dirs, _ in os.walk(file_dir):
-        print("root :　")
-        print(root)  # 当前目录路径
-        print("-----------------------")
-
+    return datetime.datetime.now().strftime('%H-%M-%d-%m-%S')
 
 def next_dir(path):
     list = []

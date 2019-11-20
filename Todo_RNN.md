@@ -15,12 +15,14 @@
 - [ ] add normalize
 
 **result** : 
-- [ ] print the information for the given model | *test_time* 
-- [ ] summary the information of the total folder and get the best result | *nhid*
-- [ ] summary the information of the total mode | *aids_LSTM*
+- [x] print the information for the given model | *test_time* 
+- [x] summary the information of the total folder and get the best result | *nhid*
+- [x] summary the information of the total mode | *aids_LSTM*
+- [ ] change the time for logs
+- [ ] **write the information to be a class**
 
 something should left now : 
-- [ ] add test loss in config.json
+- [x] add test loss in config.json
 - [ ] add a file to get the best consequence
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
