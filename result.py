@@ -33,7 +33,7 @@ def get_list(string, folder):
     return li
 
 
-def get_df(folder, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
+def get_df(folder, col=['test_loss', 'train_loss' 'nhid', 'nlayers'], required_list = 'all'):
     if isinstance(required_list, str):
         required_list = next_dir(folder)
     df_list = []
@@ -64,7 +64,7 @@ class Printer():
                 li.append(i)
         return li
 
-    def get_df(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
+    def get_df(self, col=['test_loss', 'train_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
         if isinstance(required_list, str):
             required_list = next_dir(self.folder)
         df_list = []
@@ -89,7 +89,8 @@ class Printer():
     def get_logs(self, name):
         return get_logs(os.path.join(folder, name))
 
-    def draw(self, name):
+    def im_model(self, name):
+        
 
 
     
