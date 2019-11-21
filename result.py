@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
 
 
-def get_config(model_dir, print_list = []):
+def get_config(model_dir):
     # get config
     with open(os.path.join(model_dir, 'config.json')) as f:
         config_logs = json.load(f)
-    for opt in print_list:
-        print(config_logs[opt])
+    # for opt in print_list:
+    #     print(config_logs[opt])
     # print("the test loss for %s is : %f" %(model_dir, config_logs['test_loss']))
     return config_logs
 
@@ -53,10 +53,10 @@ class Printer():
         self.dataset = self.folder.split('_')[0]
         self.model = self.folder.split('_')[1]
 
-    def next_dir_list(self):
-        return next_dir(folder)
+    def models(self):
+        return next_dir(self.folder)
 
-    def get_list(self, string):
+    def get_model(self, string):
         model_list = next_dir(self.folder)
         li = []
         for i in model_list:
@@ -86,10 +86,16 @@ class Printer():
         print(df)
         return df.idxmin()['test_loss']
 
-    def get_logs(self, name):
-        return get_logs(os.path.join(folder, name))
+    def config(self, name):
+        return get_config(os.path.join(self.folder, name))
 
-    def im_model(self, name):
+    def logs(self, name):
+        return get_logs(os.path.join(self.folder, name))
+
+    # def im_model(self, name):
+    #     model = torch.
+        
+
         
 
 

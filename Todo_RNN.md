@@ -23,7 +23,9 @@
 - [x] **write the information to be a class**
     - init with folder
     - info
+- [ ] save and load model
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
+- [ ] pred is very near for all provinces
 
 
 something should left now : 
