@@ -23,6 +23,7 @@
 - [ ] **write the information to be a class**
     - init with folder
     - info
+    - plot the result and groudtruth dataset
 
 something should left now : 
 - [x] add test loss in config.json

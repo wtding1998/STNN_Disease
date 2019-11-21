@@ -32,7 +32,7 @@ def get_list(string, folder):
             li.append(i)
     return li
 
-# TODO: ADD A CLASS
+
 def get_df(folder, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
     if isinstance(required_list, str):
         required_list = next_dir(folder)
@@ -47,20 +47,68 @@ def get_df(folder, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
     return df
 
 
+class Printer():
+    def __init__(self, folder):
+        self.folder = folder
+        self.dataset = self.folder.split('_')[0]
+        self.model = self.folder.split('_')[1]
+    def next_dir_list(self):
+        return next_dir(folder)
+    def get_list(self, string):
+        model_list = next_dir(self.folder)
+        li = []
+        for i in model_list:
+            if string in i:
+                li.append(i)
+        return li
+    def get_df(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
+        if isinstance(required_list, str):
+            required_list = next_dir(self.folder)
+        df_list = []
+        for model_name in required_list: 
+            config = get_config(os.path.join(self.folder, model_name))
+            new_df = pandas.DataFrame([config])[col]
+            new_df.index = [model_name]
+            df_list.append(new_df)
+        df =  pandas.concat(df_list, join='outer')
+        if mean:
+            df.loc['mean'] = df.apply(lambda x: x.mean())
+        if min:
+            df.loc['min'] = df.apply(lambda x: x.min())
+        return df
+    def min_idx(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
+        df = self.get_df(col=col, required_list=required_list)
+        print("the df is :")
+        print(df)
+        return df.idxmin()['test_loss']
+
+
 
 # test
+# folder = os.path.abspath(os.path.join(os.getcwd(), "..", "output", 'test'))
 # info('D:/Jupyter_Documents/ML-code/research_code/output/aids_LSTM/test_21-53-28-11-20')
 
 # df = get_df('D:/Jupyter_Documents/ML-code/research_code/output/aids_LSTM')
 # df.mean()
 
+
+
 # by list : 
-# folder = os.path.abspath(os.path.join(os.getcwd(), "..", "output", 'aids_LSTM'))
+
 # get_list('nhid_10', folder)
 # print(get_list('00_08', folder))
 # print(get_df(folder, required_list=get_list('test_00_08', folder)))   
 # print(get_df(folder, required_list=[]))
 
+# class test
+# lstm = Printer(folder)
+# print(lstm.get_df(required_list=lstm.get_list('10-40')))
+# df = lstm.get_df(mean=True, min=True)
+# lstm.,min_idx()
+# df.idxmin()['test_loss']
+# df.min()
+# df.loc['row mean'] = df.apply(lambda x: x.mean())
+# df
 # predictions = {}
 # for exp in exps:
 #     model = models[exp]
