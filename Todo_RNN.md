@@ -19,18 +19,22 @@
 - [x] summary the information of the total folder and get the best result | *nhid*
 - [x] summary the information of the total mode | *aids_LSTM*
 - [x] change the time for logs
-- [ ] add the mean to the beginning of the df
-- [ ] **write the information to be a class**
+- [x] add the mean to the beginning of the df
+- [x] **write the information to be a class**
     - init with folder
     - info
-    - plot the result and groudtruth dataset
+- [ ] for the given model list, finish the jupyter notebook to get the information of them.
+
 
 something should left now : 
 - [x] add test loss in config.json
-- [ ] add a file to get the best consequence
+- [x] add a file to get the best consequence
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
 
 
 ## test
 - [ ] compare the seq_length : 1, 2, 3, 4, 5
+
+## data 
+- [ ] the time in time

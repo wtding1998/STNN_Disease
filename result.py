@@ -2,10 +2,10 @@ import os
 import torch
 import json
 import pandas
+import matplotlib.pyplot as plt
 
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
 
-# print the information for the given model | *test_time* 
 
 def get_config(model_dir, print_list = []):
     # get config
@@ -52,8 +52,10 @@ class Printer():
         self.folder = folder
         self.dataset = self.folder.split('_')[0]
         self.model = self.folder.split('_')[1]
+
     def next_dir_list(self):
         return next_dir(folder)
+
     def get_list(self, string):
         model_list = next_dir(self.folder)
         li = []
@@ -61,6 +63,7 @@ class Printer():
             if string in i:
                 li.append(i)
         return li
+
     def get_df(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
         if isinstance(required_list, str):
             required_list = next_dir(self.folder)
@@ -76,13 +79,20 @@ class Printer():
         if min:
             df.loc['min'] = df.apply(lambda x: x.min())
         return df
+
     def min_idx(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
         df = self.get_df(col=col, required_list=required_list)
         print("the df is :")
         print(df)
         return df.idxmin()['test_loss']
 
+    def get_logs(self, name):
+        return get_logs(os.path.join(folder, name))
 
+    def draw(self, name):
+
+
+    
 
 # test
 # folder = os.path.abspath(os.path.join(os.getcwd(), "..", "output", 'test'))

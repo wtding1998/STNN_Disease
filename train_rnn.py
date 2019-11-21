@@ -166,6 +166,7 @@ with torch.no_grad():
     # if lr <= 1e-5:
     #     break
 opt.test_loss = score
+opt.train_loss = train_loss.item()
 with open(os.path.join(get_dir(opt.outputdir), opt.xp, 'config.json'), 'w') as f:
     json.dump(opt, f, sort_keys=True, indent=4)
 logger.save(model)
