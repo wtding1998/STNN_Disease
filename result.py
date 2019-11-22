@@ -2,8 +2,9 @@ import os
 import torch
 import json
 import pandas
+import numpy 
 import matplotlib.pyplot as plt
-
+from rnn_model import *
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
 
 
@@ -46,7 +47,31 @@ def get_df(folder, col=['test_loss', 'train_loss' 'nhid', 'nlayers'], required_l
     df.name = folder.split('/')[-1]
     return df
 
+class Exp():
+    def __init__(self, model, path):
+        self.path = path
+        self.config = get_config(path)
+        self.model = model
 
+    def logs(self):
+        return get_logs(self.path)
+
+    def model(self):
+        if self.model == 'LSTM':
+            model = LSTMNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
+        if self.model == 'GRU':
+            model = GRUNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
+        model.load_state_dict(torch.load(os.path.join(path, 'model.pt')))
+        return model
+    
+    def pred(self, test_input=None, time=0):
+        if os.path.exists(os.path.join(path, 'pred.txt')):
+            pred = np.genfromtxt(os.path.join(path, 'pred.txt'))
+        else:
+            print('no pred.txt')
+            pred = None
+        return torch.tensor(pred)
+            
 class Printer():
     def __init__(self, folder):
         self.folder = folder
@@ -86,11 +111,7 @@ class Printer():
         print(df)
         return df.idxmin()['test_loss']
 
-    def config(self, name):
-        return get_config(os.path.join(self.folder, name))
 
-    def logs(self, name):
-        return get_logs(os.path.join(self.folder, name))
 
     # def im_model(self, name):
     #     model = torch.

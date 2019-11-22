@@ -24,6 +24,8 @@
     - init with folder
     - info
 - [ ] save and load model
+- [ ] RNN_F
+- [ ] combine RNN and STNN
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
 - [ ] pred is very near for all provinces
 
