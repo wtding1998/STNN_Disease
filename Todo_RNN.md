@@ -25,6 +25,7 @@
     - info
 - [x] save and load model
 - [ ] add pred for STNN
+- [ ] enumerate exp by config
 - [ ] RNN_F
 - [ ] combine RNN and STNN
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
@@ -37,9 +38,6 @@ something should left now :
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
 
-
-## test
-- [ ] compare the seq_length : 1, 2, 3, 4, 5
 
 ## data 
 - [ ] the time in time
