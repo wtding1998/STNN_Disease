@@ -48,25 +48,31 @@ def get_df(folder, col=['test_loss', 'train_loss' 'nhid', 'nlayers'], required_l
     return df
 
 class Exp():
-    def __init__(self, model, path):
+    def __init__(self, exp_name, path):
         self.path = path
-        self.config = get_config(path)
-        self.model = model
+        print(self.path)
+        self.exp_name = exp_name
+        print(self.exp_name)
+        self.config = get_config(os.path.join(self.path, self.exp_name))
+
+    def model_name(self):
+        folder_name = os.path.basename(os.path.normpath(self.path))
+        return folder_name.split('_')[1]
 
     def logs(self):
-        return get_logs(self.path)
+        return get_logs(os.path.join(self.path, self.exp_name))
 
-    def model(self):
-        if self.model == 'LSTM':
+    def get_model(self):
+        if self.model_name() == 'LSTM':
             model = LSTMNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
-        if self.model == 'GRU':
+        if self.model_name() == 'GRU':
             model = GRUNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
-        model.load_state_dict(torch.load(os.path.join(path, 'model.pt')))
+        model.load_state_dict(torch.load(os.path.join(self.path, self.exp_name, 'model.pt')))
         return model
     
     def pred(self, test_input=None, time=0):
-        if os.path.exists(os.path.join(path, 'pred.txt')):
-            pred = np.genfromtxt(os.path.join(path, 'pred.txt'))
+        if os.path.exists(os.path.join(self.path, self.exp_name, 'pred.txt')):
+            pred = np.genfromtxt(os.path.join(self.path, self.exp_name, 'pred.txt'))
         else:
             print('no pred.txt')
             pred = None
@@ -105,7 +111,7 @@ class Printer():
             df.loc['min'] = df.apply(lambda x: x.min())
         return df
 
-    def min_idx(self, col=['test_loss', 'nhid', 'nlayers'], required_list = 'all'):
+    def min_idx(self, col=['test_loss', 'train_loss', 'nhid', 'nlayers'], required_list = 'all'):
         df = self.get_df(col=col, required_list=required_list)
         print("the df is :")
         print(df)

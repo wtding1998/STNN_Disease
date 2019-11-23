@@ -23,7 +23,8 @@
 - [x] **write the information to be a class**
     - init with folder
     - info
-- [ ] save and load model
+- [x] save and load model
+- [ ] add pred for STNN
 - [ ] RNN_F
 - [ ] combine RNN and STNN
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
