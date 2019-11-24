@@ -40,3 +40,15 @@ something should left now :
 
 ## data 
 - [ ] the time in time
+
+## report 
+### experiments
+- [ ] compare the short term performance with RNN
+    - [ ] for aids, flu, heat nt_train 150
+
+- [ ] for smooth data
+    - [ ] heat with LSTM
+- [ ] dim of latent factor
+### 改进
+- [ ] h_(t-1) ...
+- [ ] 
