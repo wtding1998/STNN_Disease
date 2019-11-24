@@ -72,6 +72,16 @@ def get_dir(outputdir):
 def get_time():
     return datetime.datetime.now().strftime('%H-%M-%d-%m-%S')
 
+def time_dir():
+    di = {}
+    time_list = datetime.datetime.now().strftime('%H-%M-%d-%m-%S').split('-')
+    di['hour'] = time_list[0]
+    di['minute'] = time_list[1]
+    di['day'] = time_list[2]
+    di['month'] = time_list[3]
+    di['second'] = time_list[4]
+    return di
+    
 def next_dir(path):
     list = []
     if (os.path.exists(path)):

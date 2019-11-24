@@ -2,6 +2,7 @@ import os
 import random
 from collections import defaultdict, OrderedDict
 import json
+import datetime
 
 import configargparse
 from tqdm import trange
@@ -14,7 +15,7 @@ import torch.backends.cudnn as cudnn
 
 
 from get_data import dataset_factory
-from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time
+from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, time_dir
 from rnn_model import LSTMNet, GRUNet
 import numpy as np
 
@@ -73,7 +74,6 @@ torch.manual_seed(opt.manualSeed)
 if opt.device > -1:
     torch.cuda.manual_seed_all(opt.manualSeed)
 
-
 #######################################################################################################################
 # Data
 #######################################################################################################################
@@ -97,6 +97,9 @@ if opt.auto_all:
     opt.outputdir = opt.dataset + "_" + opt.rnn_model 
     opt.xp = get_time()
 
+opt.start = time_dir()
+start_st = datetime.datetime.now()
+opt.start_time = datetime.datetime.now().strftime('%y-%m-%d-%H-%M-%S')
 #######################################################################################################################
 # Model
 #######################################################################################################################
@@ -167,6 +170,11 @@ with torch.no_grad():
     #     break
 opt.test_loss = score
 opt.train_loss = train_loss.item()
+opt.end = time_dir()
+end_st = datetime.datetime.now()
+opt.end_time = datetime.datetime.now().strftime('%y-%m-%d-%H-%M-%S')
+opt.time = str(end_st - start_st)
+
 with open(os.path.join(get_dir(opt.outputdir), opt.xp, 'config.json'), 'w') as f:
     json.dump(opt, f, sort_keys=True, indent=4)
 logger.save(model)

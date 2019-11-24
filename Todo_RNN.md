@@ -29,8 +29,7 @@
 - [ ] RNN_F
 - [ ] combine RNN and STNN
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
-- [ ] pred is very near for all provinces
-
+- [ ] add start time and end time in config
 
 something should left now : 
 - [x] add test loss in config.json
