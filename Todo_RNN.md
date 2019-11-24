@@ -28,8 +28,8 @@
 - [ ] enumerate exp by config
 - [ ] RNN_F
 - [ ] combine RNN and STNN
-- [ ] for the given model list, finish the jupyter notebook to get the information of them.
-- [ ] add start time and end time in config
+- [x] for the given model list, finish the jupyter notebook to get the information of them.
+- [x] add start time and end time in config
 
 something should left now : 
 - [x] add test loss in config.json
