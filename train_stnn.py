@@ -3,6 +3,7 @@ import random
 import json
 from collections import defaultdict, OrderedDict
 import datetime
+import numpy as np
 
 import configargparse
 from tqdm import trange
@@ -241,6 +242,11 @@ with torch.no_grad():
     score = rmse(x_pred, test_data)
 logger.log('test.rmse', score)
 logger.log('test.ts', {t: {'rmse': scr.item()} for t, scr in enumerate(score_ts)})
+
+x_pred = x_pred.view(opt.nt - opt.nt_train, opt.nx)
+x_pred = x_pred.cpu().numpy()
+np.savetxt(os.path.join(get_dir(opt.outputdir), opt.xp, 'pred.txt'), x_pred)
+
 opt.test_loss = score
 # logs_train['loss'] = logs_train['mse_dec'] + logs_train['loss_dyn']
 opt.train_loss = logs_train['loss']
