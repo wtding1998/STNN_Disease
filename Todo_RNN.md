@@ -13,6 +13,7 @@
 - [ ] complete batch_size
 - [ ] weight decay
 - [ ] add normalize
+- khop?
 
 **result** : 
 - [x] print the information for the given model | *test_time* 
@@ -24,12 +25,13 @@
     - init with folder
     - info
 - [x] save and load model
-- [ ] add pred for STNN
+- [x] add pred for STNN
+- [ ] load model for STNN
 - [ ] enumerate exp by config
 - [ ] RNN_F
 - [ ] combine RNN and STNN
 - [ ] for the given model list, finish the jupyter notebook to get the information of them.
-- [ ] add start time and end time in config
+- [x] add start time and end time in config
 
 something should left now : 
 - [x] add test loss in config.json
@@ -45,10 +47,22 @@ something should left now :
 ### experiments
 - [ ] compare the short term performance with RNN
     - [ ] for aids, flu, heat nt_train 150
-
+        - aids_rnn : 
+        - aids_stnn :
 - [ ] for smooth data
-    - [ ] heat with LSTM
+    - [x] heat with LSTM
+    - [ ] heat with STNN
 - [ ] dim of latent factor
+    - test in heat dataset 
+    - make a summary
+- [ ] decrease the constraint in dynamics may add variance in time series
+    - or the decoder is near 0-map
+- [ ] dropout:
+    - when dropout_d = dropout_f = 0.5 : the train loss will be about 230 all the time
+    - when dropout_d = dropout_f = 0.3 : the train loss will be about 160 all the time
+    - when dropout_d = dropout_f = 0.1 : the train loss will be about 50 all the time
+    - when the nlayer and nhid larger, what will be ?
+    - so what they should be?
 ### 改进
 - [ ] h_(t-1) ...
 - [ ] 

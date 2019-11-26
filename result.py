@@ -6,7 +6,7 @@ import numpy
 import matplotlib.pyplot as plt
 from rnn_model import *
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
-
+from stnn import SaptioTemporalNN
 
 def get_config(model_dir):
     # get config
@@ -59,6 +59,21 @@ class Exp():
         folder_name = os.path.basename(os.path.normpath(self.path))
         return folder_name.split('_')[1]
 
+    def dataset_name(self):
+        folder_name = os.path.basename(os.path.normpath(self.path))
+        return folder_name.split('_')[0]
+
+    def get_relations(self):
+        dataset = self.dataset_name()
+        if dataset == "heat":
+            data_path = os.path.abspath(os.path.join(self.path, "..", "heat_STNN", "data"))
+            relations = np.genfromtxt(os.path.join(data_path, "heat_relations"), delimiter=',', encoding='utf-8-sig')
+        else:
+            data_path = os.path.abspath(os.path.join(self.path, "..", "disease_STNN", "data"))
+            relations = np.genfromtxt(os.path.join(data_path, dataset+"_relations"), delimiter=',', encoding='utf-8-sig')
+        return torch.tensor(relations)
+        
+
     def logs(self):
         return get_logs(os.path.join(self.path, self.exp_name))
 
@@ -67,6 +82,10 @@ class Exp():
             model = LSTMNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
         if self.model_name() == 'GRU':
             model = GRUNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
+        else:
+            model = SaptioTemporalNN(self.get_relations(), config['nx'], config['checkpoint_interval'], 1, config['nz'], config['mode'], config['nhid'],
+                             config['nlayers'], config['dropout_f'], config['dropout_d'],
+                             config['activation'], config['periode'])
         model.load_state_dict(torch.load(os.path.join(self.path, self.exp_name, 'model.pt')))
         return model
     
@@ -77,7 +96,8 @@ class Exp():
             print('no pred.txt')
             pred = None
         return torch.tensor(pred)
-            
+
+                
 class Printer():
     def __init__(self, folder):
         self.folder = folder
