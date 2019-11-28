@@ -5,7 +5,7 @@ import pandas
 import numpy 
 import matplotlib.pyplot as plt
 from rnn_model import *
-from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
+from utils import normalize, DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
 from stnn import SaptioTemporalNN
 
 def get_config(model_dir):
@@ -66,12 +66,14 @@ class Exp():
     def get_relations(self):
         dataset = self.dataset_name()
         if dataset == "heat":
-            data_path = os.path.abspath(os.path.join(self.path, "..", "heat_STNN", "data"))
-            relations = np.genfromtxt(os.path.join(data_path, "heat_relations"), delimiter=',', encoding='utf-8-sig')
+            data_path = os.path.abspath(os.path.join(self.path, "..", "..", "heat_STNN", "data"))
+            relations = np.genfromtxt(os.path.join(data_path, "heat_relations.csv"), delimiter=',', encoding='utf-8-sig')
         else:
-            data_path = os.path.abspath(os.path.join(self.path, "..", "disease_STNN", "data"))
-            relations = np.genfromtxt(os.path.join(data_path, dataset+"_relations"), delimiter=',', encoding='utf-8-sig')
-        return torch.tensor(relations)
+            data_path = os.path.abspath(os.path.join(self.path, "..", "..", "disease_STNN", "data"))
+            relations = np.genfromtxt(os.path.join(data_path, dataset+"_relations.csv"), delimiter=',', encoding='utf-8-sig')
+        relations = torch.tensor(relations).float()
+        relations = normalize(relations).unsqueeze(1)
+        return relations
         
 
     def logs(self):
@@ -83,9 +85,9 @@ class Exp():
         if self.model_name() == 'GRU':
             model = GRUNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
         else:
-            model = SaptioTemporalNN(self.get_relations(), config['nx'], config['checkpoint_interval'], 1, config['nz'], config['mode'], config['nhid'],
-                             config['nlayers'], config['dropout_f'], config['dropout_d'],
-                             config['activation'], config['periode'])
+            model = SaptioTemporalNN(self.get_relations(), self.config['nx'], self.config['checkpoint_interval'], 1, self.config['nz'], self.config['mode'], self.config['nhid'],
+                             self.config['nlayers'], self.config['dropout_f'], self.config['dropout_d'],
+                             self.config['activation'], self.config['periode'])
         model.load_state_dict(torch.load(os.path.join(self.path, self.exp_name, 'model.pt')))
         return model
     
