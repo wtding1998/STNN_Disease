@@ -229,11 +229,11 @@ for e in pb:
     else:
         pb.set_postfix(loss=logs_train['loss'])
     # schedule lr
-    # if opt.patience > 0 and score < 12:
-    #     lr_scheduler.step(score)
-    # lr = optimizer.param_groups[0]['lr']
-    # if lr <= 1e-5:
-    #     break
+    if opt.patience > 0 and score < 0.07:
+        lr_scheduler.step(score)
+    lr = optimizer.param_groups[0]['lr']
+    if lr <= 1e-5:
+        break
 # ------------------------ Test ------------------------
 model.eval()
 with torch.no_grad():
