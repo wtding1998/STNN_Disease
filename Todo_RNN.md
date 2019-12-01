@@ -39,6 +39,10 @@ something should left now :
 - [ ] draw the picture of test_loss
 - [ ] complete the code for n-dim data
 
+## To improve STNN:
+STNN will weak in some epochs
+1. maybe watch the parameters in every model may be 0
+1. maybe add test set can improve the peformance
 
 ## data 
 - [ ] the time in time
