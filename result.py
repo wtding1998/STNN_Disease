@@ -47,6 +47,7 @@ def get_df(folder, col=['test_loss', 'train_loss' 'nhid', 'nlayers'], required_l
     df.name = folder.split('/')[-1]
     return df
 
+
 class Exp():
     def __init__(self, exp_name, path):
         self.path = path
@@ -79,7 +80,7 @@ class Exp():
     def logs(self):
         return get_logs(os.path.join(self.path, self.exp_name))
 
-    def get_model(self):
+    def model(self):
         if self.model_name() == 'LSTM':
             model = LSTMNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
         if self.model_name() == 'GRU':
@@ -98,8 +99,7 @@ class Exp():
             print('no pred.txt')
             pred = None
         return torch.tensor(pred)
-
-                
+          
 class Printer():
     def __init__(self, folder):
         self.folder = folder

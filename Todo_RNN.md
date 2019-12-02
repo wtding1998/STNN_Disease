@@ -67,6 +67,3 @@ STNN will weak in some epochs
     - when dropout_d = dropout_f = 0.1 : the train loss will be about 50 all the time
     - when the nlayer and nhid larger, what will be ?
     - so what they should be?
-### 改进
-- [ ] h_(t-1) ...
-- [ ] 
