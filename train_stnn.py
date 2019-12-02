@@ -65,7 +65,7 @@ p.add('--device', type=int, default=-1, help='-1: cpu; > -1: cuda device id')
 # -- seed
 p.add('--manualSeed', type=int, help='manual seed')
 # -- logs
-p.add('--checkpoint_interval', type=int, default=700, help='check point interval')
+p.add('--checkpoint_interval', type=int, default=100, help='check point interval')
 
 # parse
 opt = DotDict(vars(p.parse_args()))
