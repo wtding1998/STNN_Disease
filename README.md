@@ -22,16 +22,22 @@ Commands for reproducing synthetic experiments:
 
 #### STNN
 `python train_stnn.py --dataset aids --outputdir output_aids --manualSeed 1932 --xp stnn`
+
 `python train_stnn.py --dataset flu --outputdir output_flu --manualSeed 7011 --xp stnn`
+
 `python train_stnn.py --dataset heat --outputdir output_heat --manualSeed 2021 --xp stnn`
 
 #### STNN-R(efine)
 `python train_stnn.py --dataset aids --outputdir output_aids --manualSeed 3301 --xp stnn_r --mode refine --patience 800 --l1_rel 1e-8`
+
 `python train_stnn.py --dataset flu --outputdir output_flu --manualSeed 3796 --xp stnn_r --mode refine --patience 800 --l1_rel 1e-8`
+
 `python train_stnn.py --dataset heat --outputdir output_heat --manualSeed 5718 --xp stnn_r --mode refine --patience 800 --l1_rel 1e-8`
 #### STNN-D(iscovery)
 `python train_stnn.py --dataset aids --outputdir output_aids --manualSeed 1290 --xp stnn_d --mode discover --patience 1000 --l1_rel 3e-6`
+
 `python train_stnn.py --dataset flu --outputdir output_flu --manualSeed 8837 --xp stnn_d --mode discover --patience 1000 --l1_rel 3e-6`
+
 `python train_stnn.py --dataset heat --outputdir output_heat --manualSeed 9690 --xp stnn_d --mode discover --patience 1000 --l1_rel 3e-6`
 <!-- ## Modulated Heat Diffusion
 ### STNN
@@ -49,9 +55,13 @@ Here **LSTM** and **GRU** are used.
 Commands for reproducing synthetic experiments:
 #### LSTM
 `python train_rnn.py --dataset aids --model LSTM --manualSeed 1208 --xp LSTM_aids`
+
 `python train_rnn.py --dataset flu --model LSTM --manualSeed 1471 --xp LSTM_flu`
+
 `python train_rnn.py --dataset heat --model LSTM --manualSeed 6131 --xp LSTM_heat`
 #### GRU
 `python train_rnn.py --dataset aids --model GRU --manualSeed 1208 --xp GRU_aids`
+
 `python train_rnn.py --dataset flu --model GRU --manualSeed 1471 --xp GRU_flu`
+
 `python train_rnn.py --dataset heat --model GRU --manualSeed 6131 --xp GRU_heat`
