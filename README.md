@@ -1,4 +1,8 @@
 # Predict the Distribution of Disease by RNN and STNN
+
+This project is supported by the National Natural Science Foundation of China (Grant No: 11601327) and the Key Construction National “985” Program of China (Grant No: WF220426001).
+
+
 ## Data
 ### Aids
 The file `aids.csv` contains the raw temperature data. The 156 rows correspond to the 156 timestep, and the 29 columns are the 29 space points.
