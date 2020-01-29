@@ -117,8 +117,8 @@ def formated(time_list):
     return str_list
 
 if __name__ == "__main__":
-    start_time = (2020, 1 ,24, 4, 0, 0)
-    end_time = (2020, 1 , 29, 22, 0, 0)
-    df = get_df(start_time, end_time, 3600, 'curedCount')
-    df.to_excel('curedCount_h.xls')
+    start_time = (2020, 1 ,24, 16, 0, 0)
+    end_time = (2020, 1 , 29, 16, 1, 0)
+    df = get_df(start_time, end_time, 86400, 'curedCount')
+    df.to_excel('curedCount_d.xls')
 
