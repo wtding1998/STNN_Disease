@@ -10,7 +10,7 @@ def get_data_from_api():
     '''
     return a list
     '''
-    url = 'http://lab.isaaclin.cn/nCoV//api/area?latest=0'
+    url = 'https://lab.isaaclin.cn/nCoV//api/area?latest=0'
     session = requests.session()
     r = session.get(url=url)
     content = r.content.decode()
@@ -59,8 +59,8 @@ def time_as_key(province_date_list_item):
 
 
 def complete(time_list):
-    # province_date_list = get_data_from_api()
-    province_date_list = get_data_from_file('ncov_2020_01_29.txt')
+    province_date_list = get_data_from_api()
+    # province_date_list = get_data_from_file('ncov_2020_01_29.txt')
     refined_data = get_refined_province_date_list(province_date_list)
     completed_date = {}
     for province_name, province_date in refined_data.items():
