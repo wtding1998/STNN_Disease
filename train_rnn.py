@@ -14,7 +14,7 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 
 
-from get_data import dataset_factory
+from get_rnndata import dataset_factory
 from utils import DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, time_dir
 from rnn_model import LSTMNet, GRUNet
 import numpy as np

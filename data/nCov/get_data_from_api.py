@@ -5,6 +5,7 @@ import time
 import numpy
 from collections import defaultdict
 import pandas
+import configargparse
 
 def get_data_from_api():
     '''
@@ -15,7 +16,7 @@ def get_data_from_api():
     r = session.get(url=url)
     content = r.content.decode()
     provinces_date = json.loads(content)
-    print('get data from url success')
+    print('get data from ', url)
     return provinces_date['results']
 
 def get_data_from_file(file_name):
@@ -57,7 +58,6 @@ def time_as_key(province_date_list_item):
         sorted_dir[province_name] = province_date_dir
     return sorted_dir
 
-
 def complete(time_list):
     province_date_list = get_data_from_api()
     # province_date_list = get_data_from_file('ncov_2020_01_29.txt')
@@ -76,7 +76,6 @@ def complete(time_list):
             for data_kind, data in data_at_timestamp.items():
                 completed_date[province_name][data_kind].append(data)
     return completed_date
-
 
 def get_time_list(start_time, end_time, duration):
     '''
@@ -116,9 +115,38 @@ def formated(time_list):
         str_list.append(time.strftime('%m-%d %H:%M', time.localtime(timestamp)))
     return str_list
 
+def output(duration, index, output_format, data_kind):
+    start_time = [2020, 1 ,24, 4, 0, 0]
+    now = time.time()
+    now = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(now)).split('-')
+    end_time = [0, 0, 0, 0, 0, 0]
+    for i in range(len(end_time)):
+        end_time[i] = int(now[i])
+    if duration == 'h':
+        duration = 3600
+    elif duration == 'd':
+        duration = 86400
+    df = get_df(start_time, end_time, duration, data_kind + 'Count')
+    if output_format == 'csv':
+        if index == 'y':
+            df.to_csv(data_kind + '.' + output_format)
+        elif index == 'n':
+            df.to_csv(data_kind + '.' + output_format, header=False, index=False)
+    elif output_format == 'xls':
+        if index == 'y':
+            df.to_excel(data_kind + '.' + output_format)
+        elif index == 'n':
+            df.to_excel(data_kind + '.' + output_format, header=False, index=False)
+    elif output_format == 'no':
+        print(df)
+    return df
 if __name__ == "__main__":
-    start_time = (2020, 1 ,24, 16, 0, 0)
-    end_time = (2020, 1 , 29, 16, 1, 0)
-    df = get_df(start_time, end_time, 86400, 'curedCount')
-    df.to_excel('curedCount_d.xls')
+    p = configargparse.ArgParser()
+    p.add('--duration', type=str, help='h for hour | d for day', default='h')
+    p.add('--index', type=str, help='y | n', default='y')
+    p.add('--output', type=str, help='format of output: csv|xls|no output', default='no')
+    p.add('--kind', type=str, help='data kind : confirmed | dead | cured', default='confirmed')
+    opt = vars(p.parse_args())
+    output(opt['duration'], opt['index'], opt['output'], opt['kind'])
+    # df.to_excel('curedCount_d.xls')
 
