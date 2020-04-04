@@ -46,6 +46,9 @@ def change(data):
     return data / np.max(data)
 
 if __name__ == "__main__":
-    opt, data = get_data_set("data", "aids")
-    print(data)
+    opt, (train_input, train_output), (test_input, test_output) = dataset_factory('data', 'aids', 100, 3)
+    print(train_input.size())
+    print(train_output.size())
+    print(test_input.size())
+    print(test_output.size())
     

@@ -8,6 +8,10 @@ from rnn_model import *
 from utils import normalize, DotDict, Logger, rmse, rmse_tensor, boolean_string, get_dir, get_time, next_dir, get_model, model_dir
 from stnn import SaptioTemporalNN
 
+def test_reload():
+    print('4')
+    return 0
+
 def get_config(model_dir):
     # get config
     with open(os.path.join(model_dir, 'config.json')) as f:
@@ -34,17 +38,25 @@ def get_list(string, folder):
     return li
 
 
-def get_df(folder, col=['test_loss', 'train_loss' 'nhid', 'nlayers'], required_list = 'all'):
+def get_df(folder, col=['test_loss', 'train_loss', 'true_loss', 'nhid', 'nlayers'], required_list = 'all'):
     if isinstance(required_list, str):
-        required_list = next_dir(folder)
-    df_list = []
-    for model_name in required_list: 
-        config = get_config(os.path.join(folder, model_name))
-        new_df = pandas.DataFrame([config])[col]
-        new_df.index = [model_name]
-        df_list.append(new_df)
-    df =  pandas.concat(df_list, join='outer')
-    df.name = folder.split('/')[-1]
+        required_list = os.listdir(folder)
+    # df_list = []
+    # for model_name in required_list: 
+    #     config = get_config(os.path.join(folder, model_name))
+    #     new_df = pandas.DataFrame([config])[col]
+    #     new_df.index = [model_name]
+    #     df_list.append(new_df)
+    # df =  pandas.concat(df_list, join='outer')
+    # df.name = folder.split('/')[-1]
+    df_dir = {}
+    for exp_name in required_list:
+        try:
+            config = get_config(os.path.join(folder, exp_name))
+            df_dir[exp_name] = config
+        except:
+            continue
+    df = pandas.DataFrame(df_dir)
     return df
 
 
@@ -80,6 +92,9 @@ class Exp():
     def logs(self):
         return get_logs(os.path.join(self.path, self.exp_name))
 
+    def train_loss(self):
+        return self.logs()['train_epoch.loss']
+
     def model(self):
         if self.model_name() == 'LSTM':
             model = LSTMNet(self.config['nx'], self.config['nhid'], self.config['nlayers'], self.config['nx'], self.config['seq_length'])
@@ -93,11 +108,14 @@ class Exp():
         return model
     
     def pred(self, test_input=None, time=0):
-        if os.path.exists(os.path.join(self.path, self.exp_name, 'pred.txt')):
-            pred = np.genfromtxt(os.path.join(self.path, self.exp_name, 'pred.txt'))
-        else:
-            print('no pred.txt')
-            pred = None
+        pa = os.path.join(self.path, self.exp_name)
+        files = os.listdir(pa)
+        for file_name in files:
+            print(file_name)
+            if '.txt' in file_name:
+                pred = torch.tensor(np.genfromtxt(os.path.join(self.path, self.exp_name, file_name), delimiter=','))
+        if len(pred.size()) == 1:
+            pred = pred.unsqueeze(0)
         return torch.tensor(pred)
           
 class Printer():
@@ -117,16 +135,27 @@ class Printer():
                 li.append(i)
         return li
 
-    def get_df(self, col=['test_loss', 'train_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
+    def get_df(self, col=['train_loss', 'test_loss', 'true_loss', 'nhid', 'nlayers'], required_list = 'all', mean=False, min=False):
         if isinstance(required_list, str):
             required_list = next_dir(self.folder)
-        df_list = []
-        for model_name in required_list: 
-            config = get_config(os.path.join(self.folder, model_name))
-            new_df = pandas.DataFrame([config])[col]
-            new_df.index = [model_name]
-            df_list.append(new_df)
-        df =  pandas.concat(df_list, join='outer')
+        df_dir = {}
+        for exp_name in required_list:
+            try:
+                config = get_config(os.path.join(self.folder, exp_name))
+                df_dir[exp_name] = config
+            except:
+                print(exp_name, ' x')
+
+
+        df = pandas.DataFrame(df_dir)
+        df = pandas.DataFrame(df.values.T, index=df.columns, columns=df.index)[col]
+        # df_list = []
+        # for model_name in required_list: 
+        #     config = get_config(os.path.join(self.folder, model_name))
+        #     new_df = pandas.DataFrame([config])[col]
+        #     new_df.index = [model_name]
+        #     df_list.append(new_df)
+        # df =  pandas.concat(df_list, join='outer')
         if mean:
             df.loc['mean'] = df.apply(lambda x: x.mean())
         if min:

@@ -27,7 +27,7 @@ import torch.backends.cudnn as cudnn
 
 from get_dataset import get_stnn_data
 from utils import DotDict, Logger, rmse, boolean_string, get_dir, get_time, time_dir
-from stnn import SaptioTemporalNN, SaptioTemporalNN_largedecoder, SaptioTemporalNN_GRU, SaptioTemporalNN_LSTM, SaptioTemporalNN_tanh
+from stnn import SaptioTemporalNN_concat
 
 def train(command=False):
     if command == True:
@@ -55,7 +55,7 @@ def train(command=False):
         p.add('--model', type=str, help='STNN Model', default='default')
         p.add('--mode', type=str, help='STNN mode (default|refine|discover)', default='default')
         p.add('--nz', type=int, help='laten factors size', default=1)
-        p.add('--activation', type=str, help='dynamic module activation function (identity|tanh)', default='tanh')
+        p.add('--activation', type=str, help='dynamic module activation function (relu|tanh)', default='tanh')
         p.add('--khop', type=int, help='spatial depedencies order', default=1)
         p.add('--nhid', type=int, help='dynamic function hidden size', default=0)
         p.add('--nlayers', type=int, help='dynamic function num layers', default=1)
@@ -63,7 +63,7 @@ def train(command=False):
         p.add('--nlayers_de', type=int, help='dynamic function num layers', default=1)
         p.add('--dropout_f', type=float, help='latent factors dropout', default=.5)
         p.add('--dropout_d', type=float, help='dynamic function dropout', default=.5)
-        p.add('--dropout_de', type=float, help='dynamic function dropout', default=.5)
+        p.add('--simple_dec', type=boolean_string, help='use Linear in decoder', default=False)
         p.add('--lambd', type=float, help='lambda between reconstruction and dynamic losses', default=.1)
         # -- optim
         p.add('--lr', type=float, help='learning rate', default=3e-3)
@@ -78,7 +78,7 @@ def train(command=False):
         p.add('--sch_bound', type=float, help='learning rate', default=0.001)
         # -- learning
         p.add('--batch_size', type=int, default=1131, help='batch size')
-        p.add('--patience', type=int, default=150, help='number of epoch to wait before trigerring lr decay')
+        p.add('--patience', type=int, default=800, help='number of epoch to wait before trigerring lr decay')
         p.add('--nepoch', type=int, default=10, help='number of epochs to train for')
         p.add('--test', type=boolean_string, default=False, help='test during training')
 
@@ -151,7 +151,7 @@ def train(command=False):
         opt.outputdir = opt.dataset + "_" + opt.mode 
         opt.xp = get_time()
     opt.mode = opt.mode if opt.mode in ('refine', 'discover') else None
-    opt.xp = 'ori-' + opt.xp
+    opt.xp = 'concat-' + opt.xp
     opt.start = time_dir()
     start_st = datetime.datetime.now()
     opt.st = datetime.datetime.now().strftime('%y-%m-%d-%H-%M-%S')
@@ -169,15 +169,12 @@ def train(command=False):
     if opt.device > -1:
         torch.cuda.manual_seed_all(opt.manualSeed)
 
-
-
-
     #######################################################################################################################
     # Data
     #######################################################################################################################
     # -- load data
 
-    setup, (train_data, test_data, validation_data), relations = get_stnn_data(opt.datadir, opt.dataset, opt.nt_train, opt.khop, opt.start_time, rescaled_method=opt.rescaled, normalize_method=opt.normalize_method, validation_ratio=opt.validation_ratio)
+    setup, (train_data, test_data, validation_data), relations = get_stnn_data(opt.datadir, opt.dataset, opt.nt_train, opt.khop, opt.start_time, rescaled_method=opt.rescaled, normalize_method=opt.normalize_method)
     # relations = relations[:, :, :, 0]
     train_data = train_data.to(device)
     test_data = test_data.to(device)
@@ -186,31 +183,13 @@ def train(command=False):
         opt[k] = v
 
     # -- train inputs
-    t_idx = torch.arange(opt.nt_train, out=torch.LongTensor()).unsqueeze(1).expand(opt.nt_train, opt.nx).contiguous()
-    x_idx = torch.arange(opt.nx, out=torch.LongTensor()).expand_as(t_idx).contiguous()
-    # dynamic
-    idx_dyn = torch.stack((t_idx[1:], x_idx[1:])).view(2, -1).to(device)
-    nex_dyn = idx_dyn.size(1)
-    # decoder
-    idx_dec = torch.stack((t_idx, x_idx)).view(2, -1).to(device)
-    nex_dec = idx_dec.size(1)
+    t_idx = torch.arange(opt.nt_train, out=torch.LongTensor())
 
     #######################################################################################################################
     # Model
     #######################################################################################################################
-    if opt.model == 'default':
-        model = SaptioTemporalNN(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'GRU':
-        model = SaptioTemporalNN_GRU(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'LSTM':
-        model = SaptioTemporalNN_LSTM(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'ld':
-        model = SaptioTemporalNN_largedecoder(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers, opt.nhid_de, opt.nlayers_de, opt.dropout_de,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-
+    model = SaptioTemporalNN_concat(relations, train_data, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
+                        opt.dropout_f, opt.dropout_d, opt.activation, opt.periode, opt.simple_dec).to(device)
     #######################################################################################################################
     # Optimizer
     #######################################################################################################################
@@ -254,46 +233,36 @@ def train(command=False):
         # ------------------------ Train ------------------------
         model.train()
         # --- decoder ---
-        idx_perm = torch.randperm(nex_dec).to(device)
+        idx_perm = torch.randperm(opt.nt_train).to(device)
         batches = idx_perm.split(opt.batch_size)
         logs_train = defaultdict(float)
         for i, batch in enumerate(batches):
             optimizer.zero_grad()
             # data
-            input_t = idx_dec[0][batch]
-            input_x = idx_dec[1][batch]
-            x_target = train_data[input_t, input_x]
+            input_t =t_idx[batch]
+            x_target = train_data[input_t]
             # closure
-            x_rec = model.dec_closure(input_t, input_x)
+            x_rec = model.dec_closure(input_t)
             mse_dec = F.mse_loss(x_rec, x_target)
-            # backward
-            mse_dec.backward()
-            # step
-            optimizer.step()
-            # log
             # logger.log('train_iter.mse_dec', mse_dec.item())
-            logs_train['mse_dec'] += mse_dec.item() * len(batch)
+            # logs_train['mse_dec'] += mse_dec.item() * len(batch)
         # --- dynamic ---
-        idx_perm = torch.randperm(nex_dyn).to(device)
-        batches = idx_perm.split(opt.batch_size)
-        for i, batch in enumerate(batches):
-            optimizer.zero_grad()
             # data
-            input_t = idx_dyn[0][batch]
-            input_x = idx_dyn[1][batch]
+            input_t_dyn = torch.tensor([t for t in input_t if t < opt.nt_train])
             # closure
-            z_inf = model.factors[input_t, input_x]
-            z_pred = model.dyn_closure(input_t - 1, input_x)
+            z_inf = model.factors[input_t_dyn]
+            z_pred = model.dyn_closure(input_t_dyn - 1)
             # loss
             mse_dyn = z_pred.sub(z_inf).pow(2).mean()
             loss_dyn = mse_dyn * opt.lambd
             if opt.l2_z > 0:
-                loss_dyn += opt.l2_z * model.factors[input_t - 1, input_x].sub(model.factors[input_t, input_x]).pow(2).mean()
+                loss_dyn += opt.l2_z * model.factors[input_t_dyn].pow(2).mean()
             if opt.mode in('refine', 'discover') and opt.l1_rel > 0:
                 # rel_weights_tmp = model.rel_weights.data.clone()
                 loss_dyn += opt.l1_rel * model.get_relations().abs().mean()
             # backward
-            loss_dyn.backward()
+            train_loss = loss_dyn + mse_dec
+            train_loss.backward()
             # step
             optimizer.step()
             # clip
@@ -306,10 +275,6 @@ def train(command=False):
             logs_train['loss_dyn'] += loss_dyn.item() * len(batch)
 
         # --- logs ---
-        # TODO:
-        logs_train['mse_dec'] /= nex_dec
-        logs_train['mse_dyn'] /= nex_dyn
-        logs_train['loss_dyn'] /= nex_dyn
         logs_train['loss'] = logs_train['mse_dec'] + logs_train['loss_dyn']
         logger.log('train_epoch', logs_train)
         # checkpoint
@@ -347,26 +312,21 @@ def train(command=False):
         score = rmse(x_pred, test_data)
     # logger.log('test.rmse', score)
     # logger.log('test.ts', {t: {'rmse': scr.item()} for t, scr in enumerate(score_ts)})
-    true_pred_data = torch.randn_like(x_pred)
-    true_test_data = torch.randn_like(test_data)
     if opt.normalize == 'variance':
         true_pred_data = x_pred * opt.std + opt.mean
         true_test_data = test_data * opt.std + opt.mean
-    if opt.normalize == 'min_max':
+    elif opt.normalize == 'min_max':
         true_pred_data = x_pred * (opt.max - opt.min) + opt.mean
         true_test_data = test_data * (opt.max - opt.min) + opt.mean
-    true_score = rmse(true_pred_data, true_test_data)
-    # print(true_pred_data)
 
+    true_score = rmse(true_pred_data, true_test_data)
     for i in range(opt.nd):
         d_pred =true_pred_data[:,:, i].cpu().numpy()
         # print(d_pred)
         np.savetxt(os.path.join(get_dir(opt.outputdir), opt.xp, 'true_pred_' + str(i).zfill(3) +  '.txt'), d_pred, delimiter=',')
-
+    opt.train_loss = train_loss.item()
     opt.test_loss = score
     opt.true_loss = true_score
-    logs_train['loss'] = logs_train['mse_dec'] + logs_train['loss_dyn']
-    opt.train_loss = logs_train['loss']
     opt.end = time_dir()
     end_st = datetime.datetime.now()
     opt.et = datetime.datetime.now().strftime('%y-%m-%d-%H-%M-%S')

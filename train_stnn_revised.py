@@ -27,7 +27,7 @@ import torch.backends.cudnn as cudnn
 
 from get_dataset import get_stnn_data
 from utils import DotDict, Logger, rmse, boolean_string, get_dir, get_time, time_dir
-from stnn import SaptioTemporalNN, SaptioTemporalNN_largedecoder, SaptioTemporalNN_GRU, SaptioTemporalNN_LSTM, SaptioTemporalNN_tanh
+from stnn import SaptioTemporalNN_tanh
 
 def train(command=False):
     if command == True:
@@ -43,6 +43,7 @@ def train(command=False):
         p.add('--start_time', type=int, help='start time for data', default=0)
         p.add('--rescaled', type=str, help='rescaled method', default='d')
         p.add('--normalize_method', type=str, help='normalize method for relation', default='all')
+        p.add('--normalize', type=str, help='normalize method for time data (variance | min_max)', default='variance')
 
         # -- xp
         p.add('--outputdir', type=str, help='path to save xp', default='default')
@@ -151,7 +152,7 @@ def train(command=False):
         opt.outputdir = opt.dataset + "_" + opt.mode 
         opt.xp = get_time()
     opt.mode = opt.mode if opt.mode in ('refine', 'discover') else None
-    opt.xp = 'ori-' + opt.xp
+    opt.xp = 'revised-' + opt.xp
     opt.start = time_dir()
     start_st = datetime.datetime.now()
     opt.st = datetime.datetime.now().strftime('%y-%m-%d-%H-%M-%S')
@@ -177,7 +178,7 @@ def train(command=False):
     #######################################################################################################################
     # -- load data
 
-    setup, (train_data, test_data, validation_data), relations = get_stnn_data(opt.datadir, opt.dataset, opt.nt_train, opt.khop, opt.start_time, rescaled_method=opt.rescaled, normalize_method=opt.normalize_method, validation_ratio=opt.validation_ratio)
+    setup, (train_data, test_data, validation_data), relations = get_stnn_data(opt.datadir, opt.dataset, opt.nt_train, opt.khop, opt.start_time, rescaled_method=opt.rescaled, normalize_method=opt.normalize_method, normalize=opt.normalize)
     # relations = relations[:, :, :, 0]
     train_data = train_data.to(device)
     test_data = test_data.to(device)
@@ -198,18 +199,7 @@ def train(command=False):
     #######################################################################################################################
     # Model
     #######################################################################################################################
-    if opt.model == 'default':
-        model = SaptioTemporalNN(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'GRU':
-        model = SaptioTemporalNN_GRU(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'LSTM':
-        model = SaptioTemporalNN_LSTM(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
-    elif opt.model == 'ld':
-        model = SaptioTemporalNN_largedecoder(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers, opt.nhid_de, opt.nlayers_de, opt.dropout_de,
-                            opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
+    model = SaptioTemporalNN_tanh(relations, opt.nx, opt.nt_train, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers, opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
 
     #######################################################################################################################
     # Optimizer
@@ -246,6 +236,7 @@ def train(command=False):
     #######################################################################################################################
     lr = opt.lr
     opt.mintest = 1000.0
+    dyn_range = (opt.nt_train - 1) * opt.nx
     if command:
         pb = trange(opt.nepoch)
     else:
@@ -267,20 +258,17 @@ def train(command=False):
             x_rec = model.dec_closure(input_t, input_x)
             mse_dec = F.mse_loss(x_rec, x_target)
             # backward
-            mse_dec.backward()
+            # mse_dec.backward()
             # step
-            optimizer.step()
-            # log
             # logger.log('train_iter.mse_dec', mse_dec.item())
             logs_train['mse_dec'] += mse_dec.item() * len(batch)
-        # --- dynamic ---
-        idx_perm = torch.randperm(nex_dyn).to(device)
-        batches = idx_perm.split(opt.batch_size)
-        for i, batch in enumerate(batches):
-            optimizer.zero_grad()
-            # data
-            input_t = idx_dyn[0][batch]
-            input_x = idx_dyn[1][batch]
+
+            # dynamic
+            # drop the idex outof dynamic range
+            batch_dyn = [idx for idx in batch if idx < dyn_range]
+            input_t = idx_dyn[0][batch_dyn]
+            input_x = idx_dyn[1][batch_dyn]
+
             # closure
             z_inf = model.factors[input_t, input_x]
             z_pred = model.dyn_closure(input_t - 1, input_x)
@@ -292,8 +280,9 @@ def train(command=False):
             if opt.mode in('refine', 'discover') and opt.l1_rel > 0:
                 # rel_weights_tmp = model.rel_weights.data.clone()
                 loss_dyn += opt.l1_rel * model.get_relations().abs().mean()
+            loss_train = mse_dec + loss_dyn
             # backward
-            loss_dyn.backward()
+            loss_train.backward()
             # step
             optimizer.step()
             # clip
@@ -322,7 +311,7 @@ def train(command=False):
                 x_pred, _ = model.generate(opt.validation_length)
                 score = rmse(x_pred, validation_data)
             if command:
-                pb.set_postfix(loss=logs_train['loss'], test=score)
+                pb.set_postfix(loss=loss_train.item(), test=score)
             else:
                 print(e, 'loss=', logs_train['loss'], 'test=', score)
             logger.log('test_epoch.rmse', score)
@@ -336,7 +325,7 @@ def train(command=False):
                 break
         else:
             if command:
-                pb.set_postfix(loss=logs_train['loss'])
+                pb.set_postfix(loss=loss_train.item())
             else:
                 print(e, 'loss=', logs_train['loss'])
     # ------------------------ Test ------------------------
@@ -347,17 +336,14 @@ def train(command=False):
         score = rmse(x_pred, test_data)
     # logger.log('test.rmse', score)
     # logger.log('test.ts', {t: {'rmse': scr.item()} for t, scr in enumerate(score_ts)})
-    true_pred_data = torch.randn_like(x_pred)
-    true_test_data = torch.randn_like(test_data)
+
     if opt.normalize == 'variance':
         true_pred_data = x_pred * opt.std + opt.mean
-        true_test_data = test_data * opt.std + opt.mean
-    if opt.normalize == 'min_max':
+        true_score = score * opt.std
+    elif opt.normalize_method == 'min_max':
         true_pred_data = x_pred * (opt.max - opt.min) + opt.mean
-        true_test_data = test_data * (opt.max - opt.min) + opt.mean
-    true_score = rmse(true_pred_data, true_test_data)
-    # print(true_pred_data)
-
+        true_score = score * (opt.max - opt.min)
+    # save pred data
     for i in range(opt.nd):
         d_pred =true_pred_data[:,:, i].cpu().numpy()
         # print(d_pred)

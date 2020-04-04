@@ -1,14 +1,24 @@
 import os
+import random
 import json
 import datetime
 from collections import defaultdict
 
 import torch
+import numpy as np
 
 def rmse(x_pred, x_target, reduce=True):
     if reduce:
         return x_pred.sub(x_target).pow(2).sum(-1).sqrt().mean().item()
-    return x_pred.sub(x_target).pow(2).sum(2).sqrt().mean(1).squeeze()
+    mse = x_pred.sub(x_target).pow(2).sum(2).sqrt().mean(1).squeeze()
+    if len(mse.size()) == 0:
+        mse =  mse.unsqueeze(0)
+    return mse
+
+def rmse_np(x_pred, x_target):
+    x_diff = np.power(x_pred - x_target, 2)
+    mse = np.mean(np.sqrt(np.sum(x_diff, axis=2)))
+    return mse
 
 def rmse_tensor(x_pred, x_target):
     return x_pred.sub(x_target).pow(2).sum(-1).sqrt().mean()
@@ -26,6 +36,11 @@ def normalize(mx):
     r_mat_inv = torch.diag(r_inv)
     mx = r_mat_inv.matmul(mx)
     return mx
+
+def normalize_all_row(mx):
+    """2-normalize matrix"""
+    nm = torch.norm(mx)
+    return mx/nm
 
 
 def identity(input):
@@ -57,8 +72,8 @@ class Logger(object):
             self.logs[key].append(value)
 
     def checkpoint(self, model):
-        if (self.logs['epoch'] + 1) % self.chkpt_interval == 0:
-            self.save(model)
+        # if (self.logs['epoch'] + 1) % self.chkpt_interval == 0:
+        #     self.save(model)
         self.logs['epoch'] += 1
 
     def save(self, model):
@@ -108,3 +123,41 @@ def model_dir(outputdir):
 def get_model(folder_name):
     li = folder_name.split('_')
     return li[0], li[1]
+
+def shuffle_list(n, batch_size):
+    shuffled_list = list(range(n))
+    random.shuffle(shuffled_list)
+    return [shuffled_list[i:i + batch_size] for i in range(0, len(shuffled_list), batch_size)]
+    
+class Logger_keras(object):
+    def __init__(self, log_dir, name, chkpt_interval):
+        super(Logger_keras, self).__init__()
+        os.makedirs(os.path.join(log_dir, name))
+        self.log_path = os.path.join(log_dir, name, 'logs.json')
+        self.model_path = os.path.join(log_dir, name, 'keras_model.h5')
+        self.logs = defaultdict(list)
+        self.logs['epoch'] = 0
+        self.chkpt_interval = chkpt_interval
+
+    def log(self, key, value):
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self.log('{}.{}'.format(key, k), v)
+        else:
+            self.logs[key].append(value)
+
+    def checkpoint(self, model):
+        # if (self.logs['epoch'] + 1) % self.chkpt_interval == 0:
+        #     self.save(model)
+        self.logs['epoch'] += 1
+
+    def save(self, model):
+        with open(self.log_path, 'w') as f:
+            json.dump(self.logs, f, sort_keys=True, indent=4)
+        model.save(self.model_path)
+        
+
+if __name__ == "__main__":
+    a = torch.ones(2, 3, 3).float()
+    b = torch.zeros(2, 3, 3).float()
+    print(rmse(a, b, reduce=False))
