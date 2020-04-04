@@ -1,9 +1,16 @@
 # ignore
+# code useless
+train_large_stnn.py
+train_multi_stnn.py
+train_stnn_noz.py
+train_stnn_revised.py
+# file in server
 rnn.slurm
 result.todo
 get_data_from_csv.py
 test_fun.py
 debug.log
 test.ipynb
+# cache
 .ipynb_checkpoints/
 __pycache__/
