@@ -1,12 +1,48 @@
-# Predict the Distribution of Disease by RNN and STNN
+# Predict the Distribution of Disease by STNN 
 
-This project is supported by the National Natural Science Foundation of China (Grant No: 11601327) and the Key Construction National “985” Program of China (Grant No: WF220426001).
-
+This project is partially supported by Shanghai Jiao Tong University (Grant 2020RK10), National Natural Science Foundation of China (Grant 11601327) and Key Construction National "985" Program of China (Grant WF220426001).
 
 ## Data
-### Aids
-The file `aids.csv` contains the raw temperature data. The 156 rows correspond to the 156 timestep, and the 29 columns are the 29 space points.
-The file `aids_relations.csv` contains the spatial relation between the 29 space points. It is a 29 by 29 adjacency matrix _A_, where _A(i, j)_ = 1 means that series _i_ is a direct neighbor of series _j_ in space, and is 0 otherwise.
+
+### Time Data
+
+The file `data/ncov_confirmed/time_data/20200328_sum.csv` contains the current confirmed data of every province of China. The 74 rows correspond to the 74 timestep, and the 31 columns are the 31 provinces.
+
+### Relations
+
+The files in `data/ncov_confirmed/relations/` contains the spatial relations between the 31 provinces.
+
+## Usage
+
+Commands for reproducing 3 models:
+
+### STNN
+
+`python train_stnn.py --dataset ncov_confirmed `
+
+`python train_stnn.py --dataset ncov_confirmed`
+
+`python train_stnn.py --dataset ncov_confirmed`
+
+### STNN v1
+
+`python train_stnnv1.py --dataset ncov_confirmed `
+
+`python train_stnnv1.py --dataset ncov_confirmed`
+
+`python train_stnnv1.py --dataset ncov_confirmed`
+
+### STNN v1
+
+`python train_stnnv2.py --dataset ncov_confirmed`
+
+`python train_stnnv2.py --dataset ncov_confirmed`
+
+`python train_stnnv2.py --dataset ncov_confirmed`
+
+<!-- ### Aids
+The file `data/aids/time_data/aids.csv` contains the raw temperature data. The 156 rows correspond to the 156 timestep, and the 29 columns are the 29 space points.
+The file `data/aids/relations/aids_relations.csv` contains the spatial relation between the 29 space points. It is a 29 by 29 adjacency matrix _A_, where _A(i, j)_ = 1 means that series _i_ is a direct neighbor of series _j_ in space, and is 0 otherwise.
 ### Flu
 The file `flu.csv` contains the raw temperature data. The 156 rows correspond to the 156 timestep, and the 29 columns are the 29 space points.
 The file `flu_relations.csv` contains the spatial relation between the 29 space points. It is a 29 by 29 adjacency matrix _A_, where _A(i, j)_ = 1 means that series _i_ is a direct neighbor of series _j_ in space, and is 0 otherwise.
@@ -14,7 +50,7 @@ The file `flu_relations.csv` contains the spatial relation between the 29 space 
 The file `heat.csv` contains the raw temperature data. The 200 rows correspond to the 200 timestep, and the 41 columns are the 41 space points.
 The file `heat_relations.csv` contains the spatial relation between the 41 space points. It is a 41 by 41 adjacency matrix _A_, where _A(i, j)_ = 1 means that series _i_ is a direct neighbor of series _j_ in space, and is 0 otherwise.
 ## Model
-### Spatio-Temporal Neural Networks for Space-Time Series Forecasting and Relation Discovery
+### Spatio-Temporal Neural Networks for Space-Time Series Forecasting and Relation Discovery -->
 
 ICDM 2018 - IEEE International Conference on Data Mining series (ICDM)
 
